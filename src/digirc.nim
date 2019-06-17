@@ -10,7 +10,6 @@ import
   osproc
 
 import
-  gara,
   irc
 
 # Define a type to store messages.

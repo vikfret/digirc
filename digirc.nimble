@@ -10,8 +10,6 @@ bin           = @["digirc"]
 # Dependencies
 
 requires "nim >= 0.20.0"
-requires "https://github.com/johnnovak/illwill"
-requires "gara"
 requires "irc"
 
 # Tasks
