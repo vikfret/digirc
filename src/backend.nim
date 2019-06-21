@@ -17,14 +17,14 @@ proc runCmd(argv: seq[string]) =
     if argv.len < 2: return
     say = ""
     if argv[1] == "#unmute":
-      if argv[0] != "Digi":
+      if argv[0] notin ["Digi", "Digitalis"]:
         return
       muted = false
     if muted:
       return
     case argv[1]:
     of "#mute":
-      if argv[0] != "Digi":
+      if argv[0] notin ["Digi", "Digitalis"]:
         return
       muted = true
     of "#say":
@@ -38,33 +38,46 @@ proc runCmd(argv: seq[string]) =
         is_int: bool
         n: int
       for arg in argv[2 .. argv.high]:
-        try:
-          n = parseInt arg
-          is_int = true
-        except ValueError:
-          is_int = false
+        if arg.contains("x"):
+          try:
+            n = parseHexInt arg
+            is_int = true
+          except ValueError:
+            is_int = false
+        elif arg.contains("b"):
+          try:
+            n = parseBinInt arg
+            is_int = true
+          except ValueError:
+            is_int = false
+        else:
+          try:
+            n = parseInt arg
+            is_int = true
+          except ValueError:
+            is_int = false
         if is_int:
           stk &= n
         else:
           case arg:
           of "+":
-            if stk.len < 2: return
+            if stk.len < 2: break
             stk[stk.high - 1] += stk[stk.high]
             stk.del(stk.high)
           of "-":
-            if stk.len < 2: return
+            if stk.len < 2: break
             stk[stk.high - 1] -= stk[stk.high]
             stk.del(stk.high)
           of "*":
-            if stk.len < 2: return
+            if stk.len < 2: break
             stk[stk.high - 1] *= stk[stk.high]
             stk.del(stk.high)
           of "/":
-            if stk.len < 2: return
+            if stk.len < 2: break
             stk[stk.high - 1] = stk[stk.high - 1] div stk[stk.high]
             stk.del(stk.high)
           of "dup":
-            if stk.len < 1: return
+            if stk.len < 1: break
             stk &= stk[stk.high]
           else:
             discard
@@ -80,11 +93,11 @@ proc runCmd(argv: seq[string]) =
           say &= k & " "
     of "#trust":
       if argv.len < 3: return
-      if argv[0] != "Digi": return
+      if argv[0] notin ["Digi", "Digitalis"]: return
       trusted[argv[2]] = true
     of "#untrust":
       if argv.len < 3: return
-      if argv[0] != "Digi": return
+      if argv[0] notin ["Digi", "Digitalis"]: return
       trusted[argv[2]] = false
     if say == "":
       say = "OK"
