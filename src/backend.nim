@@ -76,9 +76,35 @@ proc runCmd(argv: seq[string]) =
             if stk.len < 2: break
             stk[stk.high - 1] = stk[stk.high - 1] div stk[stk.high]
             stk.del(stk.high)
+          of "nip":
+            if stk.len < 2: break
+            stk.del(stk.high - 1)
+          of "tuck":
+            if stk.len < 2: break
+            let a = stk[stk.high - 1]
+            stk.del(stk.high - 1)
+            stk &= a
+            stk &= stk[stk.high - 1]
+          of "over":
+            if stk.len < 2: break
+            stk &= stk[stk.high - 1]
+          of "swap", "swp":
+            if stk.len < 2: break
+            let c = stk[stk.high]
+            stk[stk.high] = stk[stk.high - 1]
+            stk[stk.high - 1] = c
+          of "rot":
+            if stk.len < 3: break
+            let a = stk[stk.high - 2]
+            stk[stk.high - 2] = stk[stk.high - 1]
+            stk[stk.high - 1] = stk[stk.high]
+            stk[stk.high] = a
           of "dup":
             if stk.len < 1: break
             stk &= stk[stk.high]
+          of "drop":
+            if stk.len < 1: break
+            stk.del(stk.high)
           else:
             discard
       for sub in stk:
