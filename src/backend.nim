@@ -3,6 +3,7 @@ import
   sequtils,
   strutils,
   tables,
+  math,
   os
 
 var trusted = {
@@ -11,6 +12,10 @@ var trusted = {
 }.toTable
 var muted = false
 var say = ""
+
+# TODO: Improve security by only allowing Digi if operator, and only allowing
+# Digitalis if ORENetwork.
+# This will mean reworking how the runCmd function works, most likely.
 
 proc runCmd(argv: seq[string]) =
   if (argv[0] in trusted) and trusted[argv[0]]:
@@ -75,6 +80,14 @@ proc runCmd(argv: seq[string]) =
           of "/":
             if stk.len < 2: break
             stk[stk.high - 1] = stk[stk.high - 1] div stk[stk.high]
+            stk.del(stk.high)
+          of "%":
+            if stk.len < 2: break
+            stk[stk.high - 1] = stk[stk.high - 1] mod stk[stk.high]
+            stk.del(stk.high)
+          of "^":
+            if stk.len < 2: break
+            stk[stk.high - 1] = stk[stk.high - 1] ^ stk[stk.high]
             stk.del(stk.high)
           of "nip":
             if stk.len < 2: break
