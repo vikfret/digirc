@@ -67,9 +67,9 @@ client.connect()
 
 # Backend program startup.
 
-discard execCmd "rm -f src/backend"
-discard execCmd "nim c -d:release src/backend.nim"
-var backend = startProcess("./src/backend")
+discard execCmd "rm -f ./backend"
+discard execCmd "idris --O2 src/backend.idr -o backend"
+var backend = startProcess("./backend")
 
 # Frontend command handling.
 
@@ -77,11 +77,11 @@ proc oreMsgCommand(msg: OreMsg) =
   case msg.message:
   of "#reload":
     if msg.sender == "Digi":
-      discard execCmd "rm -f src/backend"
-      let success = execCmd "nim c src/backend.nim"
+      discard execCmd "rm -f ./backend"
+      let success = execCmd "idris --O2 src/backend.idr -o backend"
       if success == 0:
         backend.close()
-        backend = startProcess("./src/backend")
+        backend = startProcess("./backend")
   else:
     if not ($msg).isNilOrWhitespace:
       backend.inputStream.writeLine $msg

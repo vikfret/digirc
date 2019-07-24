@@ -15,4 +15,4 @@ requires "irc"
 # Tasks
 
 task clean, "Cleans up files.":
-  exec "rm -f digirc src/backend"
+  exec "rm -f digirc backend src/*.ibc"
