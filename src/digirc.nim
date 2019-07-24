@@ -61,13 +61,14 @@ proc `$`(msg: OreMsg): string =
 
 # Client startup.
 
-var client = newIrc("irc.esper.net", nick = "digirc", joinChans = @["#openredstone"])
+let room = "#openredstone"
+var client = newIrc("irc.esper.net", nick = "digirc", joinChans = @[room])
 client.connect()
 
 # Backend program startup.
 
 discard execCmd "rm -f src/backend"
-discard execCmd "nim c src/backend.nim"
+discard execCmd "nim c -d:release src/backend.nim"
 var backend = startProcess("./src/backend")
 
 # Frontend command handling.
@@ -92,8 +93,8 @@ proc oreMsgCommand(msg: OreMsg) =
       of "OK":
         discard
       else:
-        echo "Backend: ", line
-        client.privmsg("#openredstone", line)
+        echo "Backend | ", line
+        client.privmsg(room, line)
 
 # Main program.
 
