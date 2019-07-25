@@ -10,6 +10,9 @@ strDrop n = (\s => substr n (length s) s)
 
 -- Main program.
 
+--baseconv : Int -> Int -> List Char -> List Char
+--baseconv a b (c:ss) = baseconv a b (
+
 rpn : List String -> List Integer -> String
 rpn [] ns = unwords . reverse $ map show ns
 rpn ("+"::ss) (b::a::ns) = rpn ss (a+b::ns)
@@ -37,13 +40,24 @@ rpn (s::ss) ns with (parsePositive {a = Integer} s)
 
 help : String -> String
 help "say" = "Says the given args. Example: #say Hello!"
+help "yell" = "Says the given args, but in uppercase. Example: #yell Hello!"
+help "swedish" = "Says the given args, but in swedish. Example: #swedish Hello!"
+help "yellswedish" = "Says the given args, but in uppercase swedish. Example: #yellswedish Hello!"
+help "spanish" = "Says the given args, but in spanish. Example: #spanish Hello!"
+help "yellspanish" = "Says the given args, but in uppercase spanish. Example: #yellspanish Hello!"
 help "whoami" = "Says your username."
 help "rpn" = "An RPN evaluator. Supports: '+', '-', '*', '/', 'dup', 'drop', 'swap', 'over', 'rot', '-rot', 'nip', 'tuck', 'pick', 'clear', 'depth'"
-help x = "Commands: say, whoami, rpn"
+help "monad" = "They're just monoids in the category of endofunctors. What's the problem?"
+help x = "Commands: say, yell, swedish, yellswedish, spanish, yellspanish, whoami, rpn"
 
 runCmd : String -> String -> String -> String -> IO String
 runCmd ("Debug") _ _ _ = pure "OK"
 runCmd _ _ ("#say") (args) = pure args
+runCmd _ _ ("#yell") (args) = pure $ toUpper args
+runCmd _ _ ("#swedish") (args) = pure $ pack . intersperse 'f' . unpack $ args
+runCmd _ _ ("#yellswedish") (args) = pure $ pack . intersperse 'F' . unpack $ toUpper args
+runCmd _ _ ("#spanish") (args) = pure $ unwords . map (++ "o") . words $ args
+runCmd _ _ ("#yellspanish") (args) = pure $ unwords . map (++ "O") . words $ toUpper args
 runCmd _ (sender) ("#whoami") _ = pure sender
 runCmd _ _ ("#rpn") (args) = pure $ rpn (words args) []
 runCmd _ _ ("#help") (args) = pure $ help args
