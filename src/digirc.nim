@@ -81,9 +81,10 @@ proc oreMsgCommand(msg: OreMsg) =
       let success = execCmd "idris --O2 src/backend.idr -o backend"
       if success == 0:
         backend.close()
+        discard execCmd "killall -9 backend"
         backend = startProcess("./backend")
   else:
-    if not ($msg).isNilOrWhitespace:
+    if (not ($msg).isNilOrWhitespace) and (not (msg.server == OreDebug)):
       backend.inputStream.writeLine $msg
       backend.inputStream.flush
       while not backend.hasData:
@@ -100,7 +101,7 @@ proc oreMsgCommand(msg: OreMsg) =
 
 var event: IrcEvent
 while true:
-  if client.poll(event):
+  if client.poll(event, timeout = 1):
     case event.typ:
     of EvMsg:
       let msg = event.eventOreMsg
