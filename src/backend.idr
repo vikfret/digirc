@@ -5,10 +5,6 @@ import Data.String
 
 -- Helper functions.
 
-unwrapInt : Maybe Int -> Int
-unwrapInt (Just x) = x
-unwrapInt Nothing = 0
-
 strDrop : Nat -> String -> String
 strDrop n = (\s => substr n (length s) s)
 
