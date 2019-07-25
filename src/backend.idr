@@ -41,12 +41,12 @@ help "whoami" = "Says your username."
 help "rpn" = "An RPN evaluator. Supports: '+', '-', '*', '/', 'dup', 'drop', 'swap', 'over', 'rot', '-rot', 'nip', 'tuck', 'pick', 'clear', 'depth'"
 help x = "Commands: say, whoami, rpn"
 
-runCmd : Maybe String -> Maybe String -> Maybe String -> Maybe String -> IO String
-runCmd (Just "Debug") _ _ _ = pure "OK"
-runCmd _ _ (Just "#say") (Just args) = pure args
-runCmd _ (Just sender) (Just "#whoami") _ = pure sender
-runCmd _ _ (Just "#rpn") (Just args) = pure $ rpn (words args) []
-runCmd _ _ (Just "#help") (Just args) = pure $ help args
+runCmd : String -> String -> String -> String -> IO String
+runCmd ("Debug") _ _ _ = pure "OK"
+runCmd _ _ ("#say") (args) = pure args
+runCmd _ (sender) ("#whoami") _ = pure sender
+runCmd _ _ ("#rpn") (args) = pure $ rpn (words args) []
+runCmd _ _ ("#help") (args) = pure $ help args
 runCmd _ _ _ _ = pure "OK"
 
 issueCmd : String -> IO String
@@ -59,7 +59,7 @@ issueCmd s =
   let cmdSplit = S.break (== ' ') message in
   let cmd = fst cmdSplit in
   let args = strDrop 1 $ snd cmdSplit in
-  runCmd (Just origin) (Just sender) (Just cmd) (Just args)
+  runCmd origin sender cmd args
 
 main : IO ()
 main = do
