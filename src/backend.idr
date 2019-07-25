@@ -9,11 +9,6 @@ unwrapInt : Maybe Int -> Int
 unwrapInt (Just x) = x
 unwrapInt Nothing = 0
 
-parseInt : String -> Int
-parseInt s with (parsePositive {a=Int} s)
-  | Just x  = x
-  | Nothing = 0
-
 strDrop : Nat -> String -> String
 strDrop n = (\s => substr n (length s) s)
 
@@ -27,13 +22,23 @@ rpn ("*"::ss) (a::b::ns) = rpn ss (b*a::ns)
 rpn ("/"::ss) (a::b::ns) = rpn ss (div b a::ns)
 rpn ("dup"::ss)  (n::ns) = rpn ss (n::n::ns)
 rpn ("drop"::ss) (n::ns) = rpn ss ns
-rpn (s::ss) ns = rpn ss (parseInt s :: ns)
+rpn ("+"::ss) s = "Syntax Error: '+' is unrecognized or invalid."
+rpn (s::ss) ns with (parsePositive {a = Int} s)
+  | Just n = rpn ss (n::ns)
+  | Nothing = "Syntax Error: '" ++ s ++ "' is unrecognized or invalid."
+
+help : String -> String
+help "say" = "Says the given args. Example: #say Hello!"
+help "whoami" = "Says your username."
+help "rpn" = "An RPN evaluator. Supports: '+', '-', '*', '/', 'dup', 'drop'"
+help x = "Commands: say, whoami, rpn"
 
 runCmd : Maybe String -> Maybe String -> Maybe String -> Maybe String -> IO String
 runCmd (Just "Debug") _ _ _ = pure "OK"
 runCmd _ _ (Just "#say") (Just args) = pure args
 runCmd _ (Just sender) (Just "#whoami") _ = pure sender
 runCmd _ _ (Just "#rpn") (Just args) = pure $ rpn (words args) []
+runCmd _ _ (Just "#help") (Just args) = pure $ help args
 runCmd _ _ _ _ = pure "OK"
 
 issueCmd : String -> IO String
