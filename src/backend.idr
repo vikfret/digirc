@@ -28,6 +28,8 @@ rpn ("tuck"::ss) (b::a::ns) = rpn ss (b::a::b::ns)
 rpn ("pick"::ss) (n::ns) with (index' (toNat n) ns)
   | Just x = rpn ss (x::ns)
   | Nothing = "Error: 'pick' is invalid."
+rpn ("clear"::ss) ns = rpn ss []
+rpn ("depth"::ss) ns = rpn ss ((toIntegerNat $ L.length ns)::ns)
 rpn ("+"::ss) s = "Error: '+' is invalid."
 rpn (s::ss) ns with (parsePositive {a = Integer} s)
   | Just n = rpn ss (n::ns)
@@ -36,7 +38,7 @@ rpn (s::ss) ns with (parsePositive {a = Integer} s)
 help : String -> String
 help "say" = "Says the given args. Example: #say Hello!"
 help "whoami" = "Says your username."
-help "rpn" = "An RPN evaluator. Supports: '+', '-', '*', '/', 'dup', 'drop', 'swap', 'over', 'rot', '-rot', 'nip', 'tuck', 'pick'"
+help "rpn" = "An RPN evaluator. Supports: '+', '-', '*', '/', 'dup', 'drop', 'swap', 'over', 'rot', '-rot', 'nip', 'tuck', 'pick', 'clear', 'depth'"
 help x = "Commands: say, whoami, rpn"
 
 runCmd : Maybe String -> Maybe String -> Maybe String -> Maybe String -> IO String
