@@ -10,23 +10,33 @@ strDrop n = (\s => substr n (length s) s)
 
 -- Main program.
 
-rpn : List String -> List Int -> String
-rpn [] ns = unwords $ map show ns
-rpn ("+"::ss) (a::b::ns) = rpn ss (b+a::ns)
-rpn ("-"::ss) (a::b::ns) = rpn ss (b-a::ns)
-rpn ("*"::ss) (a::b::ns) = rpn ss (b*a::ns)
-rpn ("/"::ss) (a::b::ns) = rpn ss (div b a::ns)
-rpn ("dup"::ss)  (n::ns) = rpn ss (n::n::ns)
+rpn : List String -> List Integer -> String
+rpn [] ns = unwords . reverse $ map show ns
+rpn ("+"::ss) (b::a::ns) = rpn ss (a+b::ns)
+rpn ("-"::ss) (b::a::ns) = rpn ss (a-b::ns)
+rpn ("*"::ss) (b::a::ns) = rpn ss (a*b::ns)
+rpn ("/"::ss) (0::a::ns) = "Error: '/' by 0 is invalid."
+rpn ("/"::ss) (b::a::ns) = rpn ss (div a b::ns)
+rpn ("dup"::ss) (n::ns) = rpn ss (n::n::ns)
 rpn ("drop"::ss) (n::ns) = rpn ss ns
-rpn ("+"::ss) s = "Syntax Error: '+' is unrecognized or invalid."
-rpn (s::ss) ns with (parsePositive {a = Int} s)
+rpn ("swap"::ss) (b::a::ns) = rpn ss (a::b::ns)
+rpn ("over"::ss) (b::a::ns) = rpn ss (a::b::a::ns)
+rpn ("rot"::ss) (c::b::a::ns) = rpn ss (a::c::b::ns)
+rpn ("-rot"::ss) (c::b::a::ns) = rpn ss (b::a::c::ns)
+rpn ("nip"::ss) (b::a::ns) = rpn ss (b::ns)
+rpn ("tuck"::ss) (b::a::ns) = rpn ss (b::a::b::ns)
+rpn ("pick"::ss) (n::ns) with (index' (toNat n) ns)
+  | Just x = rpn ss (x::ns)
+  | Nothing = "Error: 'pick' is invalid."
+rpn ("+"::ss) s = "Error: '+' is invalid."
+rpn (s::ss) ns with (parsePositive {a = Integer} s)
   | Just n = rpn ss (n::ns)
-  | Nothing = "Syntax Error: '" ++ s ++ "' is unrecognized or invalid."
+  | Nothing = "Error: '" ++ s ++ "' is unrecognized or invalid."
 
 help : String -> String
 help "say" = "Says the given args. Example: #say Hello!"
 help "whoami" = "Says your username."
-help "rpn" = "An RPN evaluator. Supports: '+', '-', '*', '/', 'dup', 'drop'"
+help "rpn" = "An RPN evaluator. Supports: '+', '-', '*', '/', 'dup', 'drop', 'swap', 'over', 'rot', '-rot', 'nip', 'tuck', 'pick'"
 help x = "Commands: say, whoami, rpn"
 
 runCmd : Maybe String -> Maybe String -> Maybe String -> Maybe String -> IO String

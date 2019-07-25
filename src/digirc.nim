@@ -84,7 +84,7 @@ proc oreMsgCommand(msg: OreMsg) =
         discard execCmd "killall -9 backend"
         backend = startProcess("./backend")
   else:
-    if (not ($msg).isNilOrWhitespace) and (not (msg.server == OreDebug)):
+    if (not ($msg).isNilOrWhitespace) and (msg.server notin [OreNote, OreDebug]):
       backend.inputStream.writeLine $msg
       backend.inputStream.flush
       while not backend.hasData:
@@ -103,6 +103,8 @@ var event: IrcEvent
 while true:
   if client.poll(event, timeout = 1):
     case event.typ:
+    of EvDisconnected, EvTimeout:
+      client.reconnect()
     of EvMsg:
       let msg = event.eventOreMsg
       echo msg
