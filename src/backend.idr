@@ -15,8 +15,7 @@ rpn [] ns = unwords . reverse $ map show ns
 rpn ("+"::ss) (b::a::ns) = rpn ss (a+b::ns)
 rpn ("-"::ss) (b::a::ns) = rpn ss (a-b::ns)
 rpn ("*"::ss) (b::a::ns) = rpn ss (a*b::ns)
-rpn ("/"::ss) (b::a::ns) = 
-  if b < rpn ss (a/b::ns)
+rpn ("/"::ss) (b::a::ns) = rpn ss (a/b::ns)
 rpn ("^"::ss) (b::a::ns) = rpn ss ((pow a b)::ns)
 rpn ("dup"::ss) (n::ns) = rpn ss (n::n::ns)
 rpn ("drop"::ss) (n::ns) = rpn ss ns
