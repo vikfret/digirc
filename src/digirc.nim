@@ -90,10 +90,7 @@ proc oreMsgCommand(msg: OreMsg) =
       while not backend.hasData:
         discard
       let line = backend.outputStream.readLine
-      case line:
-      of "OK":
-        discard
-      else:
+      if line != "OK":
         echo "Backend | ", line
         client.privmsg(room, line)
 

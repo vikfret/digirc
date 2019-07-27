@@ -10,16 +10,14 @@ strDrop n = (\s => substr n (length s) s)
 
 -- Main program.
 
---baseconv : Int -> Int -> List Char -> List Char
---baseconv a b (c:ss) = baseconv a b (
-
-rpn : List String -> List Integer -> String
+rpn : List String -> List Double -> String
 rpn [] ns = unwords . reverse $ map show ns
 rpn ("+"::ss) (b::a::ns) = rpn ss (a+b::ns)
 rpn ("-"::ss) (b::a::ns) = rpn ss (a-b::ns)
 rpn ("*"::ss) (b::a::ns) = rpn ss (a*b::ns)
-rpn ("/"::ss) (0::a::ns) = "Error: '/' by 0 is invalid."
-rpn ("/"::ss) (b::a::ns) = rpn ss (div a b::ns)
+rpn ("/"::ss) (b::a::ns) = 
+  if b < rpn ss (a/b::ns)
+rpn ("^"::ss) (b::a::ns) = rpn ss ((pow a b)::ns)
 rpn ("dup"::ss) (n::ns) = rpn ss (n::n::ns)
 rpn ("drop"::ss) (n::ns) = rpn ss ns
 rpn ("swap"::ss) (b::a::ns) = rpn ss (a::b::ns)
@@ -28,13 +26,13 @@ rpn ("rot"::ss) (c::b::a::ns) = rpn ss (a::c::b::ns)
 rpn ("-rot"::ss) (c::b::a::ns) = rpn ss (b::a::c::ns)
 rpn ("nip"::ss) (b::a::ns) = rpn ss (b::ns)
 rpn ("tuck"::ss) (b::a::ns) = rpn ss (b::a::b::ns)
-rpn ("pick"::ss) (n::ns) with (index' (toNat n) ns)
+rpn ("pick"::ss) (n::ns) with (index' (toNat (cast {to=Int} n)) ns)
   | Just x = rpn ss (x::ns)
   | Nothing = "Error: 'pick' is invalid."
 rpn ("clear"::ss) ns = rpn ss []
-rpn ("depth"::ss) ns = rpn ss ((toIntegerNat $ L.length ns)::ns)
+rpn ("depth"::ss) ns = rpn ss ((cast {to=Double} (toIntNat $ L.length ns))::ns)
 rpn ("+"::ss) s = "Error: '+' is invalid."
-rpn (s::ss) ns with (parsePositive {a = Integer} s)
+rpn (s::ss) ns with (parseDouble s)
   | Just n = rpn ss (n::ns)
   | Nothing = "Error: '" ++ s ++ "' is unrecognized or invalid."
 
@@ -46,7 +44,7 @@ help "yellswedish" = "Says the given args, but in uppercase swedish. Example: #y
 help "spanish" = "Says the given args, but in spanish. Example: #spanish Hello!"
 help "yellspanish" = "Says the given args, but in uppercase spanish. Example: #yellspanish Hello!"
 help "whoami" = "Says your username."
-help "rpn" = "An RPN evaluator. Supports: '+', '-', '*', '/', 'dup', 'drop', 'swap', 'over', 'rot', '-rot', 'nip', 'tuck', 'pick', 'clear', 'depth'"
+help "rpn" = "An RPN evaluator. Supports: '+', '-', '*', '/', '^', 'dup', 'drop', 'swap', 'over', 'rot', '-rot', 'nip', 'tuck', 'pick', 'clear', 'depth'"
 help "monad" = "They're just monoids in the category of endofunctors. What's the problem?"
 help x = "Commands: say, yell, swedish, yellswedish, spanish, yellspanish, whoami, rpn"
 
@@ -73,7 +71,10 @@ issueCmd s =
   let cmdSplit = S.break (== ' ') message in
   let cmd = fst cmdSplit in
   let args = strDrop 1 $ snd cmdSplit in
-  runCmd origin sender cmd args
+  if S.length args /= 0 then
+    runCmd origin sender cmd args
+  else
+    runCmd origin sender cmd ""
 
 main : IO ()
 main = do
