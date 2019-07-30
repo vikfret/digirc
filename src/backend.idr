@@ -81,7 +81,10 @@ main = do
   if ready then do
     line <- getLine
     out <- issueCmd line
-    putStrLn out
+    if out == "OK" then do
+      putStrLn out
+    else do
+      putStrLn $ "-> " ++ out
     fflush stdout
     main
   else do

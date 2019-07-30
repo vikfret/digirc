@@ -38,7 +38,10 @@ proc eventOreMsg*(e: IrcEvent): OreMsg =
     if not param.contains(':'):
       result.server = OreNote
       result.sender = ""
-      result.message = param[3 .. param.high]
+      if param.high >= 3:
+        result.message = param[3 .. param.high]
+      else:
+        result.message = ""
     else:
       let split = param.split(':', maxSplit = 1)
       result.sender = split[0][3 ..< split[0].high]
