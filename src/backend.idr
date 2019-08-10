@@ -17,7 +17,7 @@ rpn ("-"::ss) (b::a::ns) = rpn ss (a-b::ns)
 rpn ("*"::ss) (b::a::ns) = rpn ss (a*b::ns)
 rpn ("/"::ss) (b::a::ns) = rpn ss (a/b::ns)
 rpn ("^"::ss) (b::a::ns) = rpn ss ((pow a b)::ns)
-rpn ("dup"::ss) (n::ns) = rpn ss (n::n::ns)
+rpn ("dup"::ss) s@(n::ns) = rpn ss (n::s)
 rpn ("drop"::ss) (n::ns) = rpn ss ns
 rpn ("swap"::ss) (b::a::ns) = rpn ss (a::b::ns)
 rpn ("over"::ss) (b::a::ns) = rpn ss (a::b::a::ns)
@@ -84,7 +84,7 @@ main = do
     if out == "OK" then do
       putStrLn out
     else do
-      putStrLn $ "-> " ++ out
+      putStrLn $ "=> " ++ out
     fflush stdout
     main
   else do
