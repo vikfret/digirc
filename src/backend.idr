@@ -27,13 +27,55 @@ rpn ("nip"::ss) (b::a::ns) = rpn ss (b::ns)
 rpn ("tuck"::ss) (b::a::ns) = rpn ss (b::a::b::ns)
 rpn ("pick"::ss) (n::ns) with (index' (toNat (cast {to=Int} n)) ns)
   | Just x = rpn ss (x::ns)
-  | Nothing = "Error: 'pick' is invalid."
+  | Nothing = "Error: 'pick' went out of bounds."
 rpn ("clear"::ss) ns = rpn ss []
 rpn ("depth"::ss) ns = rpn ss ((cast {to=Double} (toIntNat $ L.length ns))::ns)
 rpn ("+"::ss) s = "Error: '+' is invalid."
 rpn (s::ss) ns with (parseDouble s)
   | Just n = rpn ss (n::ns)
-  | Nothing = "Error: '" ++ s ++ "' is unrecognized or invalid."
+  | Nothing = "Error: '" ++ s ++ "' is unrecognized or there is insufficient stack usage."
+
+quote : Int -> String
+quote 0 = "WindowsNT: Ryzen can run an infinite loop in 3 seconds"
+quote 1 = "TimBread27: enigma balls"
+quote 2 = "Borb: god yoinketh and god yeeteth away"
+quote 3 = "Optimo: good old black and white (mostly white) family sitcoms"
+quote 4 = "tokumei: it is not weeb it is actually common japanese"
+quote 5 = "chibill: also the more immutable values you have the worse peformance unless it does an so odd hack to get around the slow down to get memory or cache. Or does it just replace all instances with hard coded values? But probably not what it does."
+quote 6 = "kuki: anyone has a small hex incrementer?"
+quote 7 = "DeCapsler258: if u go in RF chat and say 'Haskell is crapskell' 3 times, u will summon Voltz and he will yell at u"
+quote 8 = "tyler: ur mom really made a killing before she went to jail for murder"
+quote 9 = "thooomas: i need immediate help from ppl who can bild compuyer and typ like dis 2"
+quote 10 = "TheCreatorJSA: rust is mozillas versoin of c++ right?"
+quote 11 = "Dorkalert2211: my mission is to bring decency to the server"
+quote 12 = "inspector95: rilly i can make a redstone computer that will have vidio games in it"
+quote 13 = "QuantumDeveloper: i don't have 2 carry in's sorry"
+quote 14 = "Hastumer: NEW LOGIC GATE!"
+quote 15 = "gangsterlx: but yeah complex numbers but except if u go higher then 64 it aint possible? :P"
+quote 16 = "Xav101: 'fake nick, fake dick, burn the heretic'"
+quote 17 = "eevv: so to fix this, we got rid of the memory ~stallman 2k17"
+quote 18 = "Cassiboy_NL_16: i go now to my real and delete you"
+quote 19 = "Quavo_Migos: eevv is a beast"
+quote 20 = "noodlot_arrain: chan can you accept my app"
+quote 21 = "michaelbuerger: I love eating LGBTs"
+quote 22 = "Koyarno: im too famous for that"
+quote 23 = "JesseFrostMiner: so what's best language for C++?"
+quote 24 = "MetalTech: why has everyone comed up with ideas before me?!?!"
+quote 25 = "tyler: a implies b means b nimpllies a"
+quote 26 = "tyler: 'you must provide a blood sample and be able to build an rca alu in 15 seconds from scratch blindfolded'"
+quote 27 = "Digi: staff fucks robots"
+quote 28 = "TheLightning1995: grill fills good cuz it has clinton rub"
+quote 29 = "Decapo (formerly known as Nickster) joined the game"
+quote 30 = "BigPig: if i were a white girl, id slurp you down like a pumpkin spice latte"
+quote 31 = "DeadMemez: no i havent applied yet, i got drunk 9 months ago and forgot all redstone knowledge I had"
+quote 32 = "Josh: whats ur most diagonal cca"
+quote 33 = "obol2: in wahch language is raspary pi? linux?"
+quote 34 = "Magic :^): carry cancer ladder"
+quote 35 = "ElegaardReds: why is there a red torch and a yellow torch?"
+quote 36 = "reepeerc709: how 2 unblock"
+quote 37 = "eevv: strong like strong korean man"
+quote 38 = "memeko: plz plz can i have op"
+quote _ = ""
 
 help : String -> String
 help "say" = "Says the given args. Example: #say Hello!"
@@ -43,9 +85,10 @@ help "yellswedish" = "Says the given args, but in uppercase swedish. Example: #y
 help "spanish" = "Says the given args, but in spanish. Example: #spanish Hello!"
 help "yellspanish" = "Says the given args, but in uppercase spanish. Example: #yellspanish Hello!"
 help "whoami" = "Says your username."
-help "rpn" = "An RPN evaluator. Supports: '+', '-', '*', '/', '^', 'dup', 'drop', 'swap', 'over', 'rot', '-rot', 'nip', 'tuck', 'pick', 'clear', 'depth'"
+help "rpn" = "An RPN evaluator. Supports: '+', '-', '*', '/', '^', 'dup', 'drop', 'swap', 'over', 'rot', '-rot', 'nip', 'tuck', 'pick', 'clear', 'depth'. Example: #rpn 2 2 +"
+help "quote" = "Say a quote. Example: #quote 37"
 help "monad" = "They're just monoids in the category of endofunctors. What's the problem?"
-help x = "Commands: say, yell, swedish, yellswedish, spanish, yellspanish, whoami, rpn"
+help x = "Commands: say, yell, swedish, yellswedish, spanish, yellspanish, whoami, rpn, quote"
 
 runCmd : String -> String -> String -> String -> IO String
 runCmd ("Debug") _ _ _ = pure "OK"
@@ -58,6 +101,10 @@ runCmd _ _ ("#yellspanish") (args) = pure $ unwords . map (++ "O") . words $ toU
 runCmd _ (sender) ("#whoami") _ = pure sender
 runCmd _ _ ("#rpn") (args) = pure $ rpn (words args) []
 runCmd _ _ ("#help") (args) = pure $ help args
+runCmd _ _ ("#quote") (args) with (parsePositive {a = Int} args)
+  | Just x = pure $ quote x
+  | Nothing = pure "OK"
+runCmd _ _ ("creeper") ("") = pure "no"
 runCmd _ _ _ _ = pure "OK"
 
 issueCmd : String -> IO String
