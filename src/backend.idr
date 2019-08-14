@@ -8,6 +8,51 @@ import Data.String
 strDrop : Nat -> String -> String
 strDrop n = (\s => substr n (length s) s)
 
+ctoi : Char -> Int
+ctoi '0' = 0
+ctoi '1' = 1
+ctoi '2' = 2
+ctoi '3' = 3
+ctoi '4' = 4
+ctoi '5' = 5
+ctoi '6' = 6
+ctoi '7' = 7
+ctoi '8' = 8
+ctoi '9' = 9
+ctoi 'a' = 10
+ctoi 'A' = 10
+ctoi 'b' = 11
+ctoi 'B' = 11
+ctoi 'c' = 12
+ctoi 'C' = 12
+ctoi 'd' = 13
+ctoi 'D' = 13
+ctoi 'e' = 14
+ctoi 'E' = 14
+ctoi 'f' = 15
+ctoi 'F' = 15
+ctoi _ = 0
+
+parseBase : Int -> String -> Int
+parseBase base str = parseBase' . reverse $ unpack str
+  where
+    parseBase' [] = 0
+    parseBase' (c::cs) = ctoi c + parseBase' cs * base
+
+showBase : Int -> Int -> String
+showBase base 0 = "0"
+showBase base num = reverse $ showBase' num
+  where
+    showBase' 0 = ""
+    showBase' n = strCons val (showBase' $ div n base)
+      where
+        val =
+          let rem = mod n base in
+          if rem > 9 then
+            chr $ rem - 10 + (ord 'a')
+          else
+            chr $ rem + (ord '0')
+
 -- Main program.
 
 rpn : List String -> List Double -> String
@@ -87,8 +132,9 @@ help "yellspanish" = "Says the given args, but in uppercase spanish. Example: #y
 help "whoami" = "Says your username."
 help "rpn" = "An RPN evaluator. Supports: '+', '-', '*', '/', '^', 'dup', 'drop', 'swap', 'over', 'rot', '-rot', 'nip', 'tuck', 'pick', 'clear', 'depth'. Example: #rpn 2 2 +"
 help "quote" = "Say a quote. Example: #quote 37"
+help "baseconv" = "Convert bases. Example: #baseconv 10 2 6"
 help "monad" = "They're just monoids in the category of endofunctors. What's the problem?"
-help x = "Commands: say, yell, swedish, yellswedish, spanish, yellspanish, whoami, rpn, quote"
+help x = "Commands: say, yell, swedish, yellswedish, spanish, yellspanish, whoami, rpn, quote, baseconv"
 
 runCmd : String -> String -> String -> String -> IO String
 runCmd ("Debug") _ _ _ = pure "OK"
@@ -100,10 +146,18 @@ runCmd _ _ ("#spanish") (args) = pure $ unwords . map (++ "o") . words $ args
 runCmd _ _ ("#yellspanish") (args) = pure $ unwords . map (++ "O") . words $ toUpper args
 runCmd _ (sender) ("#whoami") _ = pure sender
 runCmd _ _ ("#rpn") (args) = pure $ rpn (words args) []
-runCmd _ _ ("#help") (args) = pure $ help args
 runCmd _ _ ("#quote") (args) with (parsePositive {a = Int} args)
   | Just x = pure $ quote x
   | Nothing = pure "OK"
+runCmd _ _ ("#baseconv") (args) =
+  let argList = words args in
+  let Just fromArg = index' 0 argList in
+  let Just toArg = index' 1 argList in
+  let Just num = index' 2 argList in
+  let Just from = parsePositive {a = Int} fromArg in
+  let Just to = parsePositive {a = Int} toArg in
+  pure $ showBase to . parseBase from $ num 
+runCmd _ _ ("#help") (args) = pure $ help args
 runCmd _ _ ("creeper") ("") = pure "no"
 runCmd _ _ _ _ = pure "OK"
 
