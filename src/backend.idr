@@ -8,6 +8,10 @@ import Data.String
 strDrop : Nat -> String -> String
 strDrop n = (\s => substr n (length s) s)
 
+unwrapMaybe : a -> Maybe a -> a
+unwrapMaybe d (Just x) = x
+unwrapMaybe d Nothing = d
+
 ctoi : Char -> Int
 ctoi '0' = 0
 ctoi '1' = 1
@@ -34,24 +38,34 @@ ctoi 'F' = 15
 ctoi _ = 0
 
 parseBase : Int -> String -> Int
-parseBase base str = parseBase' . reverse $ unpack str
-  where
-    parseBase' [] = 0
-    parseBase' (c::cs) = ctoi c + parseBase' cs * base
+parseBase 0 str = 0
+parseBase base str = 
+  if base > 16 then
+    0
+  else
+    parseBase' . reverse $ unpack str
+      where
+        parseBase' [] = 0
+        parseBase' (c::cs) = ctoi c + parseBase' cs * base
 
 showBase : Int -> Int -> String
+showBase 0 num = "0"
 showBase base 0 = "0"
-showBase base num = reverse $ showBase' num
-  where
-    showBase' 0 = ""
-    showBase' n = strCons val (showBase' $ div n base)
+showBase base num =
+  if base > 16 then
+    "0"
+  else
+    reverse $ showBase' num
       where
-        val =
-          let rem = mod n base in
-          if rem > 9 then
-            chr $ rem - 10 + (ord 'a')
-          else
-            chr $ rem + (ord '0')
+        showBase' 0 = "0"
+        showBase' n = strCons val (showBase' $ div n base)
+          where
+            val =
+              let rem = mod n base in
+              if rem > 9 then
+                chr $ rem - 10 + (ord 'a')
+              else
+                chr $ rem + (ord '0')
 
 -- Main program.
 
@@ -120,7 +134,7 @@ quote 35 = "ElegaardReds: why is there a red torch and a yellow torch?"
 quote 36 = "reepeerc709: how 2 unblock"
 quote 37 = "eevv: strong like strong korean man"
 quote 38 = "memeko: plz plz can i have op"
-quote _ = ""
+quote _ = "OK"
 
 help : String -> String
 help "say" = "Says the given args. Example: #say Hello!"
@@ -151,12 +165,15 @@ runCmd _ _ ("#quote") (args) with (parsePositive {a = Int} args)
   | Nothing = pure "OK"
 runCmd _ _ ("#baseconv") (args) =
   let argList = words args in
-  let Just fromArg = index' 0 argList in
-  let Just toArg = index' 1 argList in
-  let Just num = index' 2 argList in
-  let Just from = parsePositive {a = Int} fromArg in
-  let Just to = parsePositive {a = Int} toArg in
-  pure $ showBase to . parseBase from $ num 
+  if length argList >= 3 then
+    let Just fromArg = index' 0 argList in
+    let Just toArg = index' 1 argList in
+    let Just num = index' 2 argList in
+    let from = unwrapMaybe 0 $ parsePositive {a = Int} fromArg in
+    let to = unwrapMaybe 0 $ parsePositive {a = Int} toArg in
+    pure $ showBase to . parseBase from $ num
+  else
+    pure "Insufficient arguments."
 runCmd _ _ ("#help") (args) = pure $ help args
 runCmd _ _ ("creeper") ("") = pure "no"
 runCmd _ _ _ _ = pure "OK"
