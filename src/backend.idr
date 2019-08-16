@@ -151,19 +151,19 @@ help "monad" = "They're just monoids in the category of endofunctors. What's the
 help x = "Commands: say, yell, swedish, yellswedish, spanish, yellspanish, whoami, rpn, quote, baseconv"
 
 runCmd : String -> String -> String -> String -> IO String
-runCmd ("Debug") _ _ _ = pure "OK"
-runCmd _ _ ("#say") (args) = pure args
-runCmd _ _ ("#yell") (args) = pure $ toUpper args
-runCmd _ _ ("#swedish") (args) = pure $ pack . intersperse 'f' . unpack $ args
-runCmd _ _ ("#yellswedish") (args) = pure $ pack . intersperse 'F' . unpack $ toUpper args
-runCmd _ _ ("#spanish") (args) = pure $ unwords . map (++ "o") . words $ args
-runCmd _ _ ("#yellspanish") (args) = pure $ unwords . map (++ "O") . words $ toUpper args
-runCmd _ (sender) ("#whoami") _ = pure sender
-runCmd _ _ ("#rpn") (args) = pure $ rpn (words args) []
-runCmd _ _ ("#quote") (args) with (parsePositive {a = Int} args)
+runCmd "Debug" _ _ _ = pure "OK"
+runCmd _ _ "#say" args = pure args
+runCmd _ _ "#yell" args = pure $ toUpper args
+runCmd _ _ "#swedish" args = pure $ pack . intersperse 'f' . unpack $ args
+runCmd _ _ "#yellswedish" args = pure $ pack . intersperse 'F' . unpack $ toUpper args
+runCmd _ _ "#spanish" args = pure $ unwords . map (++ "o") . words $ args
+runCmd _ _ "#yellspanish" args = pure $ unwords . map (++ "O") . words $ toUpper args
+runCmd _ sender "#whoami" _ = pure sender
+runCmd _ _ "#rpn" args = pure $ rpn (words args) []
+runCmd _ _ "#quote" args with (parsePositive {a = Int} args)
   | Just x = pure $ quote x
   | Nothing = pure "OK"
-runCmd _ _ ("#baseconv") (args) =
+runCmd _ _ "#baseconv" args =
   let argList = words args in
   if length argList >= 3 then
     let Just fromArg = index' 0 argList in
@@ -174,8 +174,8 @@ runCmd _ _ ("#baseconv") (args) =
     pure $ showBase to . parseBase from $ num
   else
     pure "Insufficient arguments."
-runCmd _ _ ("#help") (args) = pure $ help args
-runCmd _ _ ("creeper") ("") = pure "no"
+runCmd _ _ "#help" args = pure $ help args
+runCmd _ _ "creeper" "" = pure "no"
 runCmd _ _ _ _ = pure "OK"
 
 issueCmd : String -> IO String
