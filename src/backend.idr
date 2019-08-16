@@ -137,6 +137,7 @@ quote 38 = "memeko: plz plz can i have op"
 quote _ = "OK"
 
 help : String -> String
+help "ping" = "Returns 'pong'."
 help "say" = "Says the given args. Example: #say Hello!"
 help "yell" = "Says the given args, but in uppercase. Example: #yell Hello!"
 help "swedish" = "Says the given args, but in swedish. Example: #swedish Hello!"
@@ -152,6 +153,7 @@ help x = "Commands: say, yell, swedish, yellswedish, spanish, yellspanish, whoam
 
 runCmd : String -> String -> String -> String -> IO String
 runCmd "Debug" _ _ _ = pure "OK"
+runCmd _ _ "#ping" args = pure "pong"
 runCmd _ _ "#say" args = pure args
 runCmd _ _ "#yell" args = pure $ toUpper args
 runCmd _ _ "#swedish" args = pure $ pack . intersperse 'f' . unpack $ args
