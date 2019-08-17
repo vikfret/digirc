@@ -10,7 +10,7 @@ bin           = @["digirc"]
 # Dependencies
 
 requires "nim >= 0.20.0"
-requires "irc"
+requires "irc > 0.2.0"
 
 # Tasks
 
