@@ -149,7 +149,7 @@ help "rpn" = "An RPN evaluator. Supports: '+', '-', '*', '/', '^', 'dup', 'drop'
 help "quote" = "Say a quote. Example: #quote 37"
 help "baseconv" = "Convert bases. Example: #baseconv 10 2 6"
 help "monad" = "They're just monoids in the category of endofunctors. What's the problem?"
-help x = "Commands: say, yell, swedish, yellswedish, spanish, yellspanish, whoami, rpn, quote, baseconv"
+help x = "Commands: ping, say, yell, swedish, yellswedish, spanish, yellspanish, whoami, rpn, quote, rip, baseconv"
 
 runCmd : String -> String -> String -> String -> IO String
 runCmd "Debug" _ _ _ = pure "OK"
@@ -176,6 +176,12 @@ runCmd _ _ "#baseconv" args =
     pure $ showBase to . parseBase from $ num
   else
     pure "Insufficient arguments."
+runCmd _ _ "#rip" args = pure $ pack . riplace . unpack $ args
+  where
+    riplace [] = []
+    riplace [_] = ['r']
+    riplace [_, _] = ['r', 'i']
+    riplace (_::_::_::xs) = 'r'::'i'::'p'::xs
 runCmd _ _ "#help" args = pure $ help args
 runCmd _ _ "creeper" "" = pure "no"
 runCmd _ _ _ _ = pure "OK"
