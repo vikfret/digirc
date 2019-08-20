@@ -176,12 +176,11 @@ runCmd _ _ "#baseconv" args =
     pure $ showBase to . parseBase from $ num
   else
     pure "Insufficient arguments."
-runCmd _ _ "#rip" args = pure $ pack . riplace . unpack $ args
-  where
-    riplace [] = []
-    riplace [_] = ['r']
-    riplace [_, _] = ['r', 'i']
-    riplace (_::_::_::xs) = 'r'::'i'::'p'::xs
+runCmd _ _ "#rip" args =
+  if (fromNat $ length args) < 3 then
+    pure $ substr 0 (length args) "rip"
+  else
+    pure $ "rip" ++ strDrop 3 args
 runCmd _ _ "#help" args = pure $ help args
 runCmd _ _ "creeper" "" = pure "no"
 runCmd _ _ _ _ = pure "OK"
