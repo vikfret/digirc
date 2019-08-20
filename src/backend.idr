@@ -147,6 +147,7 @@ help "yellspanish" = "Says the given args, but in uppercase spanish. Example: #y
 help "whoami" = "Says your username."
 help "rpn" = "An RPN evaluator. Supports: '+', '-', '*', '/', '^', 'dup', 'drop', 'swap', 'over', 'rot', '-rot', 'nip', 'tuck', 'pick', 'clear', 'depth'. Example: #rpn 2 2 +"
 help "quote" = "Say a quote. Example: #quote 37"
+help "rip" = "RIP a user. Example: #rip Digitalis"
 help "baseconv" = "Convert bases. Example: #baseconv 10 2 6"
 help "monad" = "They're just monoids in the category of endofunctors. What's the problem?"
 help x = "Commands: ping, say, yell, swedish, yellswedish, spanish, yellspanish, whoami, rpn, quote, rip, baseconv"
