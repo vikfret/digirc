@@ -8,10 +8,6 @@ import Data.String
 strDrop : Nat -> String -> String
 strDrop n = (\s => substr n (length s) s)
 
-unwrapMaybe : a -> Maybe a -> a
-unwrapMaybe d (Just x) = x
-unwrapMaybe d Nothing = d
-
 ctoi : Char -> Int
 ctoi '0' = 0
 ctoi '1' = 1
@@ -172,8 +168,8 @@ runCmd _ _ "#baseconv" args =
     let Just fromArg = index' 0 argList in
     let Just toArg = index' 1 argList in
     let Just num = index' 2 argList in
-    let from = unwrapMaybe 0 $ parsePositive {a = Int} fromArg in
-    let to = unwrapMaybe 0 $ parsePositive {a = Int} toArg in
+    let from = fromMaybe 0 $ parsePositive {a = Int} fromArg in
+    let to = fromMaybe 0 $ parsePositive {a = Int} toArg in
     pure $ showBase to . parseBase from $ num
   else
     pure "Insufficient arguments."
