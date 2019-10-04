@@ -72,27 +72,31 @@ client.connect()
 
 discard execCmd "rm -f ./backend"
 discard execCmd "idris --O2 src/backend.idr -o backend"
-var backend = startProcess("./backend")
 
 # Frontend command handling.
 
 proc oreMsgCommand(msg: OreMsg) =
-  case msg.message:
+  let parts = msg.message.split(maxsplit = 1)
+  case parts[0]:
   of "#reload":
     if msg.sender == "Digi":
-      discard execCmd "rm -f ./backend"
-      let success = execCmd "idris --O2 src/backend.idr -o backend"
-      if success == 0:
-        backend.close()
-        discard execCmd "killall -9 backend"
-        backend = startProcess("./backend")
+      discard execCmd "idris --O2 src/backend.idr -o backend"
+  of "#type":
+    var (line, errc) = execCmdEx("mueval --inferred-type -T --expression " & parts[1].quoteShell & " +RTS -N2 -RTS")
+    let lins = line.strip.split(seps = Newlines)
+    line = lins[lins.high]
+    echo "Backend | ", line
+    client.privmsg(room, line)
+  of "#eval":
+    var (line, ercc) = execCmdEx("mueval --expression " & parts[1].quoteShell & " +RTS -N2 -RTS")
+    line = line.strip
+    if line != "OK":
+      echo "Backend | ", line
+      client.privmsg(room, line)
   else:
     if (not ($msg).isNilOrWhitespace) and (msg.server notin [OreNote, OreDebug]):
-      backend.inputStream.writeLine $msg
-      backend.inputStream.flush
-      while not backend.hasData:
-        discard
-      let line = backend.outputStream.readLine
+      var (line, errc) = execCmdEx("./backend " & ($msg).quoteShell)
+      line = line.strip
       if line != "OK":
         echo "Backend | ", line
         client.privmsg(room, line)

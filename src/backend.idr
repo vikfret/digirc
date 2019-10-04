@@ -8,61 +8,6 @@ import Data.String
 strDrop : Nat -> String -> String
 strDrop n = (\s => substr n (length s) s)
 
-ctoi : Char -> Int
-ctoi '0' = 0
-ctoi '1' = 1
-ctoi '2' = 2
-ctoi '3' = 3
-ctoi '4' = 4
-ctoi '5' = 5
-ctoi '6' = 6
-ctoi '7' = 7
-ctoi '8' = 8
-ctoi '9' = 9
-ctoi 'a' = 10
-ctoi 'A' = 10
-ctoi 'b' = 11
-ctoi 'B' = 11
-ctoi 'c' = 12
-ctoi 'C' = 12
-ctoi 'd' = 13
-ctoi 'D' = 13
-ctoi 'e' = 14
-ctoi 'E' = 14
-ctoi 'f' = 15
-ctoi 'F' = 15
-ctoi _ = 0
-
-parseBase : Int -> String -> Int
-parseBase 0 str = 0
-parseBase base str = 
-  if base > 16 then
-    0
-  else
-    parseBase' . reverse $ unpack str
-      where
-        parseBase' [] = 0
-        parseBase' (c::cs) = ctoi c + parseBase' cs * base
-
-showBase : Int -> Int -> String
-showBase 0 num = "0"
-showBase base 0 = "0"
-showBase base num =
-  if base > 16 then
-    "0"
-  else
-    reverse $ showBase' num
-      where
-        showBase' 0 = "0"
-        showBase' n = strCons val (showBase' $ div n base)
-          where
-            val =
-              let rem = mod n base in
-              if rem > 9 then
-                chr $ rem - 10 + (ord 'a')
-              else
-                chr $ rem + (ord '0')
-
 -- Main program.
 
 rpn : List String -> List Double -> String
@@ -94,12 +39,12 @@ quote : Int -> String
 quote 0 = "WindowsNT: Ryzen can run an infinite loop in 3 seconds"
 quote 1 = "TimBread27: enigma balls"
 quote 2 = "Borb: god yoinketh and god yeeteth away"
-quote 3 = "Optimo: good old black and white (mostly white) family sitcoms"
+quote 3 = "O_ptimo: good old black and white (mostly white) family sitcoms"
 quote 4 = "tokumei: it is not weeb it is actually common japanese"
 quote 5 = "chibill: also the more immutable values you have the worse peformance unless it does an so odd hack to get around the slow down to get memory or cache. Or does it just replace all instances with hard coded values? But probably not what it does."
 quote 6 = "kuki: anyone has a small hex incrementer?"
 quote 7 = "DeCapsler258: if u go in RF chat and say 'Haskell is crapskell' 3 times, u will summon Voltz and he will yell at u"
-quote 8 = "tyler: ur mom really made a killing before she went to jail for murder"
+quote 8 = "t_yler: ur mom really made a killing before she went to jail for murder"
 quote 9 = "thooomas: i need immediate help from ppl who can bild compuyer and typ like dis 2"
 quote 10 = "TheCreatorJSA: rust is mozillas versoin of c++ right?"
 quote 11 = "Dorkalert2211: my mission is to bring decency to the server"
@@ -116,11 +61,11 @@ quote 21 = "michaelbuerger: I love eating LGBTs"
 quote 22 = "Koyarno: im too famous for that"
 quote 23 = "JesseFrostMiner: so what's best language for C++?"
 quote 24 = "MetalTech: why has everyone comed up with ideas before me?!?!"
-quote 25 = "no"
-quote 26 = "tyler: 'you must provide a blood sample and be able to build an rca alu in 15 seconds from scratch blindfolded'"
+quote 25 = "p_auk: puak takes te topic a gain !"
+quote 26 = "t_yler: 'you must provide a blood sample and be able to build an rca alu in 15 seconds from scratch blindfolded'"
 quote 27 = "SealLovah: koy's design is making me want to commit shrimp flavored grave"
 quote 28 = "TheLightning1995: grill fills good cuz it has clinton rub"
-quote 29 = "Decapo (formerly known as Nickster) joined the game"
+quote 29 = "Decapo (formerly known as N_ickster) joined the game"
 quote 30 = "BigPig: if i were a white girl, id slurp you down like a pumpkin spice latte"
 quote 31 = "DeadMemez: no i havent applied yet, i got drunk 9 months ago and forgot all redstone knowledge I had"
 quote 32 = "Josh: whats ur most diagonal cca"
@@ -129,7 +74,14 @@ quote 34 = "Magic :^): carry cancer ladder"
 quote 35 = "ElegaardReds: why is there a red torch and a yellow torch?"
 quote 36 = "reepeerc709: how 2 unblock"
 quote 37 = "eevv: strong like strong korean man"
-quote 38 = "memeko: plz plz can i have op"
+quote 38 = "HyperXti: Ev: I say very advanced words to make me look chlorophyll."
+quote 39 = "Neogreenyew: time is money; and money is happiness"
+quote 40 = "Neogreenyew: the power of christ rappels you"
+quote 41 = "konsumlamm: sigma balls"
+quote 42 = "n_ickster: paukkupalikka more like paukkupaligma"
+quote 43 = "Nemes left the game; Tukeque: aaaaaaaaand she's gone"
+quote 44 = "EEVV: i Reside In The s T a T e S.... ! voltz: g a s p"
+quote 45 = "Nielsapie: im here on dpol and i dont see any bud ram MY GOD PLZ I WANT BUD RAM"
 quote _ = "OK"
 
 help : String -> String
@@ -140,13 +92,21 @@ help "swedish" = "Says the given args, but in swedish. Example: #swedish Hello!"
 help "yellswedish" = "Says the given args, but in uppercase swedish. Example: #yellswedish Hello!"
 help "spanish" = "Says the given args, but in spanish. Example: #spanish Hello!"
 help "yellspanish" = "Says the given args, but in uppercase spanish. Example: #yellspanish Hello!"
+help "aesthetic" = "Says the given args, but in aesthetic. Example: #aesthetic Hello!"
+help "mock" = "Mocks the given args. Example: #mock Hello!"
 help "whoami" = "Says your username."
 help "rpn" = "An RPN evaluator. Supports: '+', '-', '*', '/', '^', 'dup', 'drop', 'swap', 'over', 'rot', '-rot', 'nip', 'tuck', 'pick', 'clear', 'depth'. Example: #rpn 2 2 +"
-help "quote" = "Say a quote. Example: #quote 37"
+help "quote" = "Say a quote. Example: #quote 45"
 help "rip" = "RIP a user. Example: #rip Digitalis"
-help "baseconv" = "Convert bases. Example: #baseconv 10 2 6"
+help "eval" = "Evaluate a haskell expression's value. Example: #eval fmap (+ 1) [1, 2, 3]"
+help "type" = "Evaluate a haskell expression's type. Example: #eval fmap (+ 1)"
 help "monad" = "They're just monoids in the category of endofunctors. What's the problem?"
-help x = "Commands: ping, say, yell, swedish, yellswedish, spanish, yellspanish, whoami, rpn, quote, rip, baseconv"
+help x = "Commands: ping, say, yell, swedish, yellswedish, spanish, yellspanish, aesthetic, mock, whoami, rpn, quote, rip, eval, type"
+
+mock : List Char -> List Char
+mock (a::b::cs) = toLower a :: toUpper b :: mock cs
+mock (a::[]) = toLower a :: []
+mock [] = []
 
 runCmd : String -> String -> String -> String -> IO String
 runCmd "Debug" _ _ _ = pure "OK"
@@ -157,22 +117,13 @@ runCmd _ _ "#swedish" args = pure $ unwords . map (pack . intersperse 'f' . unpa
 runCmd _ _ "#yellswedish" args = pure $ unwords . map (pack . intersperse 'F' . unpack) . words $ toUpper args
 runCmd _ _ "#spanish" args = pure $ unwords . map (++ "o") . words $ args
 runCmd _ _ "#yellspanish" args = pure $ unwords . map (++ "O") . words $ toUpper args
+runCmd _ _ "#aesthetic" args = pure $ unwords . map singleton $ unpack args
+runCmd _ _ "#mock" args = pure . pack . mock $ unpack args
 runCmd _ sender "#whoami" _ = pure sender
 runCmd _ _ "#rpn" args = pure $ rpn (words args) []
 runCmd _ _ "#quote" args with (parsePositive {a = Int} args)
   | Just x = pure $ quote x
   | Nothing = pure "OK"
-runCmd _ _ "#baseconv" args =
-  let argList = words args in
-  if length argList >= 3 then
-    let Just fromArg = index' 0 argList in
-    let Just toArg = index' 1 argList in
-    let Just num = index' 2 argList in
-    let from = fromMaybe 0 $ parsePositive {a = Int} fromArg in
-    let to = fromMaybe 0 $ parsePositive {a = Int} toArg in
-    pure $ showBase to . parseBase from $ num
-  else
-    pure "Insufficient arguments."
 runCmd _ _ "#rip" args =
   if (fromNat $ length args) < 3 then
     pure $ substr 0 (length args) "rip"
@@ -199,15 +150,10 @@ issueCmd s =
 
 main : IO ()
 main = do
-  ready <- fpoll stdin
-  if ready then do
-    line <- getLine
-    out <- issueCmd line
-    if out == "OK" then do
-      putStrLn out
-    else do
-      putStrLn $ "=> " ++ out
-    fflush stdout
-    main
+  args <- getArgs
+  let line = unwords $ drop 1 args
+  out <- issueCmd line
+  if out == "OK" then do
+    putStrLn out
   else do
-    main
+    putStrLn $ "=> " ++ out
