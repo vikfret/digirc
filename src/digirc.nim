@@ -82,12 +82,16 @@ proc oreMsgCommand(msg: OreMsg) =
     if msg.sender == "Digi":
       discard execCmd "idris --O2 src/backend.idr -o backend"
   of "#type":
+    if parts.len < 2:
+      return
     var (line, errc) = execCmdEx("mueval --inferred-type -T --expression " & parts[1].quoteShell & " +RTS -N2 -RTS")
     let lins = line.strip.split(seps = Newlines)
     line = lins[lins.high]
     echo "Backend | ", line
     client.privmsg(room, line)
   of "#eval":
+    if parts.len < 2:
+      return
     var (line, ercc) = execCmdEx("mueval --expression " & parts[1].quoteShell & " +RTS -N2 -RTS")
     line = line.strip
     if line != "OK":
