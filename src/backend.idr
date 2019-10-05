@@ -5,8 +5,17 @@ import Data.String
 
 -- Helper functions.
 
+composeN : List (a -> a) -> (a -> a)
+composeN = foldr (.) id
+
 strDrop : Nat -> String -> String
 strDrop n = (\s => substr n (length s) s)
+
+repBy : String -> String -> (String -> String)
+repBy a b = (\x => if x == a then b else x)
+
+multiReplace : List (String -> String) -> List String -> List String
+multiReplace rs = map (composeN rs) 
 
 -- Main program.
 
@@ -82,6 +91,8 @@ quote 42 = "n_ickster: paukkupalikka more like paukkupaligma"
 quote 43 = "Nemes left the game; Tukeque: aaaaaaaaand she's gone"
 quote 44 = "EEVV: i Reside In The s T a T e S.... ! voltz: g a s p"
 quote 45 = "Nielsapie: im here on dpol and i dont see any bud ram MY GOD PLZ I WANT BUD RAM"
+quote 46 = "ExApollo: OH NO I CANT HEAR YOU I HAVE AIRPODS IN"
+quote 47 = "Claminuts: haskell more like ask hell"
 quote _ = "OK"
 
 help : String -> String
@@ -96,7 +107,7 @@ help "aesthetic" = "Says the given args, but in aesthetic. Example: #aesthetic H
 help "mock" = "Mocks the given args. Example: #mock Hello!"
 help "whoami" = "Says your username."
 help "rpn" = "An RPN evaluator. Supports: '+', '-', '*', '/', '^', 'dup', 'drop', 'swap', 'over', 'rot', '-rot', 'nip', 'tuck', 'pick', 'clear', 'depth'. Example: #rpn 2 2 +"
-help "quote" = "Say a quote. Example: #quote 45"
+help "quote" = "Say a quote. Example: #quote 46"
 help "rip" = "RIP a user. Example: #rip Digitalis"
 help "eval" = "Evaluate a haskell expression's value. Example: #eval fmap (+ 1) [1, 2, 3]"
 help "type" = "Evaluate a haskell expression's type. Example: #eval fmap (+ 1)"
@@ -107,6 +118,39 @@ mock : List Char -> List Char
 mock (a::b::cs) = toLower a :: toUpper b :: mock cs
 mock (a::[]) = toLower a :: []
 mock [] = []
+
+qed : List (String -> String)
+qed = [ repBy "\\empty" "Ø"
+      , repBy "\\in" "∈"
+      , repBy "\\notin" "∉"
+      , repBy "\\union" "⋃"
+      , repBy "\\cup" "⋃"
+      , repBy "\\intersection" "⋂"
+      , repBy "\\cap" "⋂"
+      , repBy "\\subset" "⊂"
+      , repBy "\\subseteq" "⊆"
+      , repBy "\\proves" "⊢"
+      , repBy "\\qed" "∎"
+      , repBy "\\exists" "∃"
+      , repBy "\\forall" "∀"
+      , repBy "\\bottom" "⊥"
+      , repBy "\\top" "⊤"
+      , repBy "\\xor" "⊕"
+      , repBy "\\or" "∨"
+      , repBy "\\and" "∧"
+      , repBy "\\not" "¬"
+      , repBy "\\to" "→"
+      , repBy "\\gamma" "Γ"
+      , repBy "\\lambda" "λ"
+      , repBy "\\mu" "μ"
+      , repBy "\\int" "∫"
+      , repBy "\\cint" "∮"
+      , repBy "\\real" "ℝ"
+      , repBy "\\rational" "ℚ"
+      , repBy "\\natural" "ℕ"
+      , repBy "\\integer" "ℤ"
+      , repBy "\\equiv" "⇔"
+      ]
 
 runCmd : String -> String -> String -> String -> IO String
 runCmd "Debug" _ _ _ = pure "OK"
@@ -121,6 +165,8 @@ runCmd _ _ "#yellspanish" args = pure $ unwords . map (++ "O") . words $ toUpper
 runCmd _ _ "#aesthetic" args = pure $ unwords . map singleton $ unpack args
 runCmd _ _ "#mock" args = pure . pack . mock $ unpack args
 runCmd _ _ "#spongebob" args = pure . pack . mock $ unpack args
+runCmd _ _ "#thank" args = pure $ "Thank You " ++ args ++ ", Very Cool!"
+runCmd _ _ "#qed" args = pure $ unwords . multiReplace qed . words $ args
 runCmd _ sender "#whoami" _ = pure sender
 runCmd _ _ "#rpn" args = pure $ rpn (words args) []
 runCmd _ _ "#quote" args with (parsePositive {a = Int} args)
@@ -132,8 +178,15 @@ runCmd _ _ "#rip" args =
   else
     pure $ "rip" ++ strDrop 3 args
 runCmd _ _ "#help" args = pure $ help args
-runCmd _ _ "creeper" "" = pure "no"
-runCmd _ _ _ _ = pure "OK"
+runCmd _ _ "creeper" _ = pure "no"
+runCmd _ _ a bs =
+  let ws = words . toLower $ a ++ " " ++ bs in
+  if hasAny ["owo", "uwu"] ws then
+    pure "stop it. get some help."
+  else if hasAny ["oop", "class", "object", "method", "objects", "object-oriented"] ws then
+    pure "[ ] OOP allowed"
+  else
+    pure "OK"
 
 issueCmd : String -> IO String
 issueCmd s =

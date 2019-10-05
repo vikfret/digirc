@@ -87,21 +87,22 @@ proc oreMsgCommand(msg: OreMsg) =
     var (line, errc) = execCmdEx("mueval --inferred-type -T --expression " & parts[1].quoteShell & " +RTS -N2 -RTS")
     let lins = line.strip.split(seps = Newlines)
     line = lins[lins.high]
+    line = msg.sender & " => " & line.strip
     echo "Backend | ", line
     client.privmsg(room, line)
   of "#eval":
     if parts.len < 2:
       return
     var (line, ercc) = execCmdEx("mueval --expression " & parts[1].quoteShell & " +RTS -N2 -RTS")
-    line = line.strip
-    if line != "OK":
-      echo "Backend | ", line
-      client.privmsg(room, line)
+    line = msg.sender & " => " & line.strip
+    echo "Backend | ", line
+    client.privmsg(room, line)
   else:
     if (not ($msg).isNilOrWhitespace) and (msg.server notin [OreNote, OreDebug]):
       var (line, errc) = execCmdEx("./backend " & ($msg).quoteShell)
       line = line.strip
       if line != "OK":
+        line = msg.sender & " " & line
         echo "Backend | ", line
         client.privmsg(room, line)
 
