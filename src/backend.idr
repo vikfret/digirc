@@ -119,38 +119,49 @@ mock (a::b::cs) = toLower a :: toUpper b :: mock cs
 mock (a::[]) = toLower a :: []
 mock [] = []
 
-qed : List (String -> String)
-qed = [ repBy "\\empty" "Ø"
-      , repBy "\\in" "∈"
-      , repBy "\\notin" "∉"
-      , repBy "\\union" "⋃"
-      , repBy "\\cup" "⋃"
-      , repBy "\\intersection" "⋂"
-      , repBy "\\cap" "⋂"
-      , repBy "\\subset" "⊂"
-      , repBy "\\subseteq" "⊆"
-      , repBy "\\proves" "⊢"
-      , repBy "\\qed" "∎"
-      , repBy "\\exists" "∃"
-      , repBy "\\forall" "∀"
-      , repBy "\\bottom" "⊥"
-      , repBy "\\top" "⊤"
-      , repBy "\\xor" "⊕"
-      , repBy "\\or" "∨"
-      , repBy "\\and" "∧"
-      , repBy "\\not" "¬"
-      , repBy "\\to" "→"
-      , repBy "\\gamma" "Γ"
-      , repBy "\\lambda" "λ"
-      , repBy "\\mu" "μ"
-      , repBy "\\int" "∫"
-      , repBy "\\cint" "∮"
-      , repBy "\\real" "ℝ"
-      , repBy "\\rational" "ℚ"
-      , repBy "\\natural" "ℕ"
-      , repBy "\\integer" "ℤ"
-      , repBy "\\equiv" "⇔"
-      ]
+qedReps : List (String -> String)
+qedReps = [ repBy "\\empty" "Ø "
+          , repBy "\\in" "∈ "
+          , repBy "\\notin" "∉ "
+          , repBy "\\union" "⋃ "
+          , repBy "\\cup" "⋃ "
+          , repBy "\\intersection" "⋂ "
+          , repBy "\\cap" "⋂ "
+          , repBy "\\subset" "⊂ "
+          , repBy "\\subseteq" "⊆ "
+          , repBy "\\proves" "⊢ "
+          , repBy "\\qed" "∎ "
+          , repBy "\\exists" "∃"
+          , repBy "\\forall" "∀"
+          , repBy "\\bottom" "⊥ "
+          , repBy "\\top" "⊤ "
+          , repBy "\\xor" "⊕ "
+          , repBy "\\or" "∨ "
+          , repBy "\\and" "∧ "
+          , repBy "\\not" "¬"
+          , repBy "\\to" "→ "
+          , repBy "\\gamma" "Γ "
+          , repBy "\\lambda" "λ"
+          , repBy "\\mu" "μ "
+          , repBy "\\int" "∫ "
+          , repBy "\\cint" "∮ "
+          , repBy "\\real" "ℝ "
+          , repBy "\\rational" "ℚ "
+          , repBy "\\natural" "ℕ "
+          , repBy "\\integer" "ℤ "
+          , repBy "\\equiv" "⇔ "
+          ]
+
+qed : String -> String
+qed = pack . qed' [] . unpack . (++ " ")
+  where qed' : List Char -> List Char -> List Char
+        qed' [] ('\\'::cs) = qed' ['\\'] cs 
+        qed' [] (c::cs) = c :: qed' [] cs
+        qed' w@(s::ss) (' '::cs) = (unpack (composeN qedReps $ pack w)) ++ qed' [] cs
+        qed' w@(s::ss) (')'::cs) = (unpack (composeN qedReps $ pack w)) ++ [')'] ++ qed' [] cs
+        qed' w@(s::ss) ('}'::cs) = (unpack (composeN qedReps $ pack w)) ++ ['}'] ++ qed' [] cs
+        qed' w@(s::ss) (c::cs) = qed' (w ++ [c]) cs
+        qed' _ _ = []
 
 runCmd : String -> String -> String -> String -> IO String
 runCmd "Debug" _ _ _ = pure "OK"
@@ -166,7 +177,7 @@ runCmd _ _ "#aesthetic" args = pure $ unwords . map singleton $ unpack args
 runCmd _ _ "#mock" args = pure . pack . mock $ unpack args
 runCmd _ _ "#spongebob" args = pure . pack . mock $ unpack args
 runCmd _ _ "#thank" args = pure $ "Thank You " ++ args ++ ", Very Cool!"
-runCmd _ _ "#qed" args = pure $ unwords . multiReplace qed . words $ args
+runCmd _ _ "#qed" args = pure . qed $ args
 runCmd _ sender "#whoami" _ = pure sender
 runCmd _ _ "#rpn" args = pure $ rpn (words args) []
 runCmd _ _ "#quote" args with (parsePositive {a = Int} args)
@@ -183,8 +194,6 @@ runCmd _ _ a bs =
   let ws = words . toLower $ a ++ " " ++ bs in
   if hasAny ["owo", "uwu"] ws then
     pure "stop it. get some help."
-  else if hasAny ["oop", "class", "object", "method", "objects", "object-oriented"] ws then
-    pure "[ ] OOP allowed"
   else
     pure "OK"
 
