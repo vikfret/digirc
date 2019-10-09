@@ -14,9 +14,6 @@ strDrop n = (\s => substr n (length s) s)
 repBy : String -> String -> (String -> String)
 repBy a b = (\x => if x == a then b else x)
 
-multiReplace : List (String -> String) -> List String -> List String
-multiReplace rs = map (composeN rs) 
-
 -- Main program.
 
 rpn : List String -> List Double -> String
