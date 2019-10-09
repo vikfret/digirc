@@ -189,13 +189,7 @@ runCmd _ _ "#rip" args =
   else
     pure $ "rip" ++ strDrop 3 args
 runCmd _ _ "#help" args = pure $ help args
-runCmd _ _ "creeper" _ = pure "no"
-runCmd _ _ a bs =
-  let ws = words . toLower $ a ++ " " ++ bs in
-  if hasAny ["owo", "uwu"] ws then
-    pure "stop it. get some help."
-  else
-    pure "OK"
+runCmd _ _ a bs = pure "OK"
 
 issueCmd : String -> IO String
 issueCmd s =
