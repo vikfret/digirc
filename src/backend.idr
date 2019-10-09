@@ -127,6 +127,7 @@ qedReps = [ repBy "\\empty" "Ø "
           , repBy "\\subset" "⊂ "
           , repBy "\\subseteq" "⊆ "
           , repBy "\\proves" "⊢ "
+          , repBy "\\vdash" "⊢ "
           , repBy "\\qed" "∎ "
           , repBy "\\exists" "∃"
           , repBy "\\forall" "∀"
@@ -140,6 +141,7 @@ qedReps = [ repBy "\\empty" "Ø "
           , repBy "\\gamma" "Γ "
           , repBy "\\lambda" "λ"
           , repBy "\\mu" "μ "
+          , repBy "\\psi" "ψ "
           , repBy "\\int" "∫ "
           , repBy "\\cint" "∮ "
           , repBy "\\real" "ℝ "
@@ -157,6 +159,8 @@ qed = pack . qed' [] . unpack . (++ " ")
         qed' w@(s::ss) (' '::cs) = (unpack (composeN qedReps $ pack w)) ++ qed' [] cs
         qed' w@(s::ss) (')'::cs) = (unpack (composeN qedReps $ pack w)) ++ [')'] ++ qed' [] cs
         qed' w@(s::ss) ('}'::cs) = (unpack (composeN qedReps $ pack w)) ++ ['}'] ++ qed' [] cs
+        qed' w@(s::ss) ('('::cs) = (unpack (composeN qedReps $ pack w)) ++ ['('] ++ qed' [] cs
+        qed' w@(s::ss) ('{'::cs) = (unpack (composeN qedReps $ pack w)) ++ ['{'] ++ qed' [] cs
         qed' w@(s::ss) (c::cs) = qed' (w ++ [c]) cs
         qed' _ _ = []
 
