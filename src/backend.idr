@@ -79,7 +79,7 @@ quote 33 = "obol2: in wahch language is raspary pi? linux?"
 quote 34 = "Magic :^): carry cancer ladder"
 quote 35 = "ElegaardReds: why is there a red torch and a yellow torch?"
 quote 36 = "reepeerc709: how 2 unblock"
-quote 37 = "eevv: strong like strong korean man"
+quote 37 = "Ecconia: how are you doning; eevv: strong like strong korean man; Ecconia: whatever I will continue cya"
 quote 38 = "HyperXti: Ev: I say very advanced words to make me look chlorophyll."
 quote 39 = "Neogreenyew: time is money; and money is happiness"
 quote 40 = "Neogreenyew: the power of christ rappels you"
@@ -90,6 +90,8 @@ quote 44 = "EEVV: i Reside In The s T a T e S.... ! voltz: g a s p"
 quote 45 = "Nielsapie: im here on dpol and i dont see any bud ram MY GOD PLZ I WANT BUD RAM"
 quote 46 = "ExApollo: OH NO I CANT HEAR YOU I HAVE AIRPODS IN"
 quote 47 = "Claminuts: haskell more like ask hell"
+quote 48 = "Pantomchap: next person to say sksksksk will get skskskinned alive"
+quote 49 = "Q_werasd: Archimedes nuts"
 quote _ = "OK"
 
 help : String -> String
@@ -112,9 +114,13 @@ help "monad" = "They're just monoids in the category of endofunctors. What's the
 help x = "Commands: ping, say, yell, swedish, yellswedish, spanish, yellspanish, aesthetic, mock, whoami, rpn, quote, rip, eval, type"
 
 mock : List Char -> List Char
-mock (a::b::cs) = toLower a :: toUpper b :: mock cs
-mock (a::[]) = toLower a :: []
-mock [] = []
+mock = mock' False
+  where
+    mock' : Bool -> List Char -> List Char 
+    mock' s (' '::cs) = ' ' :: mock' s cs
+    mock' False (c::cs) = toLower c :: mock' True cs
+    mock' True (c::cs) = toUpper c :: mock' False cs
+    mock' _ [] = []
 
 qedReps : List (String -> String)
 qedReps = [ repBy "\\empty" "Ø "
