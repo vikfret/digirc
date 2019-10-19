@@ -92,6 +92,8 @@ quote 46 = "ExApollo: OH NO I CANT HEAR YOU I HAVE AIRPODS IN"
 quote 47 = "Claminuts: haskell more like ask hell"
 quote 48 = "Pantomchap: next person to say sksksksk will get skskskinned alive"
 quote 49 = "Q_werasd: Archimedes nuts"
+quote 50 = "QwerBot: it is i googled it becoming self aware slowly"
+quote 51 = "QwerBot: Javascript? bro I'm considering building, but tehre's no nyoom ?!?!?!"
 quote _ = "OK"
 
 help : String -> String
@@ -144,10 +146,17 @@ qedReps = [ repBy "\\empty" "Ø "
           , repBy "\\and" "∧ "
           , repBy "\\not" "¬"
           , repBy "\\to" "→ "
+          , repBy "\\alpha" "α "
           , repBy "\\gamma" "Γ "
           , repBy "\\lambda" "λ"
+          , repBy "\\Lambda" "Λ"
           , repBy "\\mu" "μ "
           , repBy "\\psi" "ψ "
+          , repBy "\\pi" "π "
+          , repBy "\\tau" "τ "
+          , repBy "\\sigma" "σ "
+          , repBy "\\Sigma" "Σ "
+          , repBy "\\Pi" "Π"
           , repBy "\\int" "∫ "
           , repBy "\\cint" "∮ "
           , repBy "\\real" "ℝ "
@@ -163,10 +172,11 @@ qed = pack . qed' [] . unpack . (++ " ")
         qed' [] ('\\'::cs) = qed' ['\\'] cs 
         qed' [] (c::cs) = c :: qed' [] cs
         qed' w@(s::ss) (' '::cs) = (unpack (composeN qedReps $ pack w)) ++ qed' [] cs
-        qed' w@(s::ss) (')'::cs) = (unpack (composeN qedReps $ pack w)) ++ [')'] ++ qed' [] cs
-        qed' w@(s::ss) ('}'::cs) = (unpack (composeN qedReps $ pack w)) ++ ['}'] ++ qed' [] cs
-        qed' w@(s::ss) ('('::cs) = (unpack (composeN qedReps $ pack w)) ++ ['('] ++ qed' [] cs
-        qed' w@(s::ss) ('{'::cs) = (unpack (composeN qedReps $ pack w)) ++ ['{'] ++ qed' [] cs
+        qed' w@(s::ss) (')'::cs) = (unpack (trim . composeN qedReps $ pack w)) ++ [')'] ++ qed' [] cs
+        qed' w@(s::ss) ('}'::cs) = (unpack (trim . composeN qedReps $ pack w)) ++ ['}'] ++ qed' [] cs
+        qed' w@(s::ss) ('('::cs) = (unpack (trim . composeN qedReps $ pack w)) ++ ['('] ++ qed' [] cs 
+        qed' w@(s::ss) ('{'::cs) = (unpack (trim . composeN qedReps $ pack w)) ++ ['{'] ++ qed' [] cs
+        qed' w@(s::ss) ('.'::cs) = (unpack (trim . composeN qedReps $ pack w)) ++ ['.'] ++ qed' [] cs
         qed' w@(s::ss) (c::cs) = qed' (w ++ [c]) cs
         qed' _ _ = []
 
